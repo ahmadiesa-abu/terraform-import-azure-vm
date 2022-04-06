@@ -1,8 +1,8 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 description: >
-  This blueprint import AWS ec2 instance to cloudify using Terraform
-  and if given a new instance_type value it will trigger
+  This blueprint import Azure virtual-machine to cloudify using Terraform
+  and if given a new vm_size value it will trigger
   an update on that instance.
 
 imports:
@@ -71,9 +71,15 @@ node_templates:
           TF_REGISTRY_CLIENT_TIMEOUT: "20"
     interfaces:
       cloudify.interfaces.lifecycle:
-        configure: {}
-        start: {}
-        poststart: {}
+        configure:
+          implementation: tf.cloudify_tf.tasks.import_resource
+          inputs:
+            resource_address: { get_input: resource_address }
+            resource_id: { get_input: resource_id }
+        start:
+          implementation: tf.cloudify_tf.tasks.plan
+        poststart:
+          implementation: tf.cloudify_tf.tasks.apply
         delete: {}
 
 
